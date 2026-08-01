@@ -6,7 +6,7 @@ import './Navbar.css';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, session, logout } = useApp();
+  const { isAuthenticated, user, subscriptionTier, logout } = useApp();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <div className="navbar-auth">
               <span className="navbar-user">
-                {session?.name} ({session?.plan})
+                {user?.name} ({subscriptionTier})
               </span>
               <button className="btn btn-outline btn-sm" onClick={handleLogout}>
                 Log out
@@ -104,7 +104,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <span className="mobile-user">
-                    {session?.name} ({session?.plan})
+                    {user?.name} ({subscriptionTier})
                   </span>
                   <button className="btn btn-outline w-full" onClick={handleLogout}>
                     Log out

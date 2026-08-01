@@ -6,18 +6,11 @@ import './CheckoutSuccess.css';
 export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = useApp();
   const [countdown, setCountdown] = useState(5);
 
-  const planName = location.state?.planName || session?.plan || 'Pro TrackID';
-  const billingCycle = location.state?.billingCycle || session?.billingCycle || 'monthly';
+  const planName = location.state?.planName || 'Pro TrackID';
 
   useEffect(() => {
-    const hasPlan = session?.plan || location.state?.planName;
-    if (!hasPlan) {
-      navigate('/plans', { replace: true });
-      return;
-    }
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -28,7 +21,7 @@ export default function CheckoutSuccess() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [session, location.state, navigate]);
+  }, []);
 
   useEffect(() => {
     if (countdown === 0) {
@@ -47,7 +40,7 @@ export default function CheckoutSuccess() {
         </div>
         <h1>Payment Successful</h1>
         <p className="success-message">
-          Your <strong>{planName}</strong> plan ({billingCycle}) has been activated.
+          Your <strong>{planName}</strong> plan has been activated.
         </p>
 
         <div className="success-details">
@@ -56,8 +49,8 @@ export default function CheckoutSuccess() {
             <strong>{planName}</strong>
           </div>
           <div className="detail-row">
-            <span>Billing</span>
-            <strong>{billingCycle === 'yearly' ? 'Yearly' : 'Monthly'}</strong>
+            <span>Status</span>
+            <strong>Active</strong>
           </div>
           <div className="detail-row">
             <span>Activated</span>

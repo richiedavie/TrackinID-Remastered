@@ -31,9 +31,6 @@
 }
 
 .summary-plan {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 16px;
@@ -41,14 +38,7 @@
 
 .summary-plan-name {
   font-weight: 600;
-}
-
-.summary-plan-billing {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  background-color: var(--bg-alternate);
-  padding: 4px 10px;
-  border-radius: 12px;
+  font-size: 1.125rem;
 }
 
 .summary-price {

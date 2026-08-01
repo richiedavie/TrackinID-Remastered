@@ -20,14 +20,8 @@ export default function Login() {
       setError('Please fill in all fields.');
       return;
     }
-    const session = login(email, password);
-    if (session.plan) {
-      navigate(from, { replace: true });
-    } else if (session.userType) {
-      navigate('/plans', { replace: true });
-    } else {
-      navigate('/onboarding', { replace: true });
-    }
+    login(email, password);
+    navigate(from, { replace: true });
   };
 
   return (

@@ -23,11 +23,11 @@ function formatExpiry(value) {
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { session, activatePlan, addToast } = useApp();
+  const { subscriptionTier, setTier, addToast } = useApp();
 
-  const pendingPlan = JSON.parse(sessionStorage.getItem('trackin_id_pending_plan') || 'null');
-  const plan = location.state?.plan || pendingPlan?.plan;
-  const billingCycle = location.state?.billingCycle || pendingPlan?.billingCycle || 'monthly';
+  const planParam = new URLSearchParams(location.search).get('plan');
+  const pendingPlan = sessionStorage.getItem('trackin_id_pending_plan');
+  const plan = planParam || pendingPlan || subscriptionTier || 'pro';
 
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [processing, setProcessing] = useState(false);
@@ -80,7 +80,7 @@ export default function Checkout() {
 
   const selectedTier = {
     name: tierNames[plan] || plan,
-    price: billingCycle === 'yearly' ? tierPrices[plan]?.yearly : tierPrices[plan]?.monthly,
+    price: 'monthly' ? tierPrices[plan]?.monthly : tierPrices[plan]?.yearly,
     features: selectedTierData.features,
   };
 
@@ -93,12 +93,13 @@ export default function Checkout() {
     }, 1500);
 
     setTimeout(() => {
-      activatePlan(plan, billingCycle);
+      setTier(plan);
       sessionStorage.removeItem('trackin_id_pending_plan');
       setProcessing(false);
+      addToast(`Plan ${tierNames[plan]} activated!`, 'success');
       navigate('/dashboard', {
         replace: true,
-        state: { planName: tierNames[plan] || plan, billingCycle, paymentSuccess: true },
+        state: { planName: tierNames[plan] || plan, paymentSuccess: true },
       });
     }, 3000);
   };
@@ -115,14 +116,11 @@ export default function Checkout() {
             <h2>Order Summary</h2>
             <div className="summary-plan">
               <span className="summary-plan-name">{selectedTier.name}</span>
-              <span className="summary-plan-billing">
-                {billingCycle === 'yearly' ? 'Yearly' : 'Monthly'}
-              </span>
             </div>
             <div className="summary-price">
               <span className="currency">Rp</span>
               <span className="amount">{selectedTier.price}</span>
-              <span className="period">/{billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
+              <span className="period">/month</span>
             </div>
             <ul className="summary-features">
               {selectedTier.features.map((f, i) => (

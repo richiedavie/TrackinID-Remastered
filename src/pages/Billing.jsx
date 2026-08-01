@@ -1,35 +1,30 @@
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { TIERS } from '../config/tiers';
 import PricingCards from '../components/PricingCards';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { TIERS } from '../config/tiers';
 import './Plans.css';
 
 export default function BillingPage() {
-  const { session } = useApp();
+  const { subscriptionTier } = useApp();
   const navigate = useNavigate();
 
   return (
-    <ProtectedRoute requirePlan={false}>
+    <ProtectedRoute>
       <div className="plans-page">
         <div className="container">
           <div className="plans-header">
             <h1>Upgrade Your Plan</h1>
             <p>
-              Current plan: <strong>{session?.plan ? TIERS[session.plan]?.name || session.plan : 'None'}</strong>
+              Current plan: <strong>{subscriptionTier ? TIERS[subscriptionTier]?.name || subscriptionTier : 'None'}</strong>
             </p>
           </div>
 
           <PricingCards
-            onPlanSelect={(tier, billingCycle) => {
-              sessionStorage.setItem(
-                'trackin_id_pending_plan',
-                JSON.stringify({ plan: tier, billingCycle })
-              );
-              navigate('/checkout');
+            onPlanSelect={(tier) => {
+              navigate(`/checkout?plan=${tier}`);
             }}
-            userType={session?.userType}
+            userType={null}
           />
         </div>
       </div>

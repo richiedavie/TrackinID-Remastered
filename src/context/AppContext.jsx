@@ -8,63 +8,41 @@ import { TIERS } from '../config/tiers';
 
 const AppContext = createContext();
 
-const USERS_KEY = 'trackin_id_users';
-const SESSION_KEY = 'trackin_id_session';
-
-function generateId() {
-  return `u_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function loadUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function loadSession() {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveSession(session) {
-  if (session) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  } else {
-    localStorage.removeItem(SESSION_KEY);
-  }
-}
+const STORAGE_KEY = 'trackin_id_session_v1';
 
 export function AppProvider({ children }) {
-  const [users, setUsers] = useState(loadUsers);
-  const [session, setSession] = useState(loadSession);
-  const [darkMode, setDarkMode] = useState(false);
+  const savedState = localStorage.getItem(STORAGE_KEY);
+  const initial = savedState ? JSON.parse(savedState) : null;
 
-  const [vehicles, setVehicles] = useState(initialVehicles);
-  const [drivers, setDrivers] = useState(initialDrivers);
-  const [alerts, setAlerts] = useState(initialAlerts);
-  const [maintenance, setMaintenance] = useState(initialMaintenance);
-  const [team, setTeam] = useState(initialTeam);
+  const [isAuthenticated, setIsAuthenticated] = useState(initial?.isAuthenticated ?? false);
+  const [user, setUser] = useState(initial?.user ?? null);
+  const [subscriptionTier, setSubscriptionTier] = useState(initial?.subscriptionTier ?? null);
+  const [darkMode, setDarkMode] = useState(initial?.darkMode ?? false);
+
+  const [vehicles, setVehicles] = useState(initial?.vehicles ?? initialVehicles);
+  const [drivers, setDrivers] = useState(initial?.drivers ?? initialDrivers);
+  const [alerts, setAlerts] = useState(initial?.alerts ?? initialAlerts);
+  const [maintenance, setMaintenance] = useState(initial?.maintenance ?? initialMaintenance);
+  const [team, setTeam] = useState(initial?.team ?? initialTeam);
 
   const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
-    saveUsers(users);
-  }, [users]);
-
-  useEffect(() => {
-    saveSession(session);
-  }, [session]);
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        isAuthenticated,
+        user,
+        subscriptionTier,
+        darkMode,
+        vehicles,
+        drivers,
+        alerts,
+        maintenance,
+        team,
+      })
+    );
+  }, [isAuthenticated, user, subscriptionTier, darkMode, vehicles, drivers, alerts, maintenance, team]);
 
   useEffect(() => {
     if (darkMode) {
@@ -96,128 +74,35 @@ export function AppProvider({ children }) {
   }, []);
 
   const login = (email, password) => {
-    const existing = users.find((u) => u.email === email);
-    if (existing) {
-      const sess = {
-        userId: existing.id,
-        name: existing.name,
-        email: existing.email,
-        userType: existing.userType,
-        plan: existing.plan,
-        billingCycle: existing.billingCycle,
-        planActivatedAt: existing.planActivatedAt,
-      };
-      setSession(sess);
-      if (existing.userType === 'consumer') {
-        setVehicles((prev) => prev.slice(0, 1));
-      } else if (vehicles.length === 1) {
-        setVehicles(initialVehicles);
-      }
-      return sess;
-    }
-    const newUser = {
-      id: generateId(),
+    const mockUser = {
+      id: 'u_1',
       name: email.split('@')[0],
       email,
-      password,
-      userType: null,
-      plan: null,
-      billingCycle: null,
-      planActivatedAt: null,
     };
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    const sess = {
-      userId: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      userType: null,
-      plan: null,
-      billingCycle: null,
-      planActivatedAt: null,
-    };
-    setSession(sess);
-    return sess;
+    setUser(mockUser);
+    setIsAuthenticated(true);
+    return mockUser;
   };
 
   const signup = (name, email, password) => {
-    const newUser = {
-      id: generateId(),
+    const mockUser = {
+      id: 'u_1',
       name,
       email,
-      password,
-      userType: null,
-      plan: null,
-      billingCycle: null,
-      planActivatedAt: null,
     };
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    const sess = {
-      userId: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      userType: null,
-      plan: null,
-      billingCycle: null,
-      planActivatedAt: null,
-    };
-    setSession(sess);
-    return sess;
+    setUser(mockUser);
+    setIsAuthenticated(true);
+    return mockUser;
   };
 
   const logout = () => {
-    setSession(null);
-    setVehicles(initialVehicles);
+    setUser(null);
+    setIsAuthenticated(false);
+    setSubscriptionTier(null);
   };
 
-  const setUserType = (type) => {
-    if (!session) return;
-    const updated = users.map((u) =>
-      u.id === session.userId ? { ...u, userType: type } : u
-    );
-    setUsers(updated);
-    const updatedSession = { ...session, userType: type };
-    setSession(updatedSession);
-    if (type === 'consumer') {
-      setVehicles((prev) => prev.slice(0, 1));
-    } else if (vehicles.length === 1) {
-      setVehicles(initialVehicles);
-    }
-  };
-
-  const activatePlan = (plan, billingCycle) => {
-    if (!session) return;
-    const updatedUsers = users.map((u) =>
-      u.id === session.userId
-        ? {
-            ...u,
-            plan,
-            billingCycle,
-            planActivatedAt: Date.now(),
-          }
-        : u
-    );
-    setUsers(updatedUsers);
-    const updatedSession = {
-      ...session,
-      plan,
-      billingCycle,
-      planActivatedAt: Date.now(),
-    };
-    setSession(updatedSession);
-    addToast(`Plan ${TIERS[plan]?.name || plan} activated!`, 'success');
-  };
-
-  const updatePlan = (newPlan) => {
-    if (!session) return;
-    const updatedUsers = users.map((u) =>
-      u.id === session.userId ? { ...u, plan: newPlan } : u
-    );
-    setUsers(updatedUsers);
-    const updatedSession = { ...session, plan: newPlan };
-    setSession(updatedSession);
-    addToast(`Successfully switched plan to ${TIERS[newPlan]?.name || newPlan}!`, 'success');
+  const setTier = (tier) => {
+    setSubscriptionTier(tier);
   };
 
   const toggleDarkMode = () => {
@@ -240,17 +125,13 @@ export function AppProvider({ children }) {
     const randomVehicle = vehicles[Math.floor(Math.random() * vehicles.length)] || initialVehicles[0];
     const newAlert = {
       id: `a_${Date.now()}`,
-      type: 'speed',
-      title: 'Demo Alert Triggered',
+      type: 'security',
       message: `${randomVehicle.name} sudden acceleration detected on route.`,
-      severity: 'warning',
-      vehicle: randomVehicle.name,
       timestamp: 'Just now',
-      sentViaChannels: TIERS[session?.plan]?.features?.alerts === 'smart',
-      read: false,
+      isRead: false,
     };
     setAlerts((prev) => [newAlert, ...prev]);
-    addToast(`ALERT: ${newAlert.title} - ${randomVehicle.name}`, 'warning');
+    addToast(`ALERT: ${newAlert.message}`, 'warning');
   };
 
   const addVehicle = (newVeh) => {
@@ -270,21 +151,12 @@ export function AppProvider({ children }) {
     addToast(`Invited ${member.email} as ${member.role}`, 'success');
   };
 
-  const isAuthenticated = session !== null;
-  const hasPlan = session?.plan !== null && session?.plan !== undefined;
-  const hasUserType = session?.userType !== null && session?.userType !== undefined;
-
   return (
     <AppContext.Provider
       value={{
-        session,
         isAuthenticated,
-        hasPlan,
-        hasUserType,
-        userType: session?.userType ?? null,
-        plan: session?.plan ?? null,
-        billingCycle: session?.billingCycle ?? null,
-        planActivatedAt: session?.planActivatedAt ?? null,
+        user,
+        subscriptionTier,
         darkMode,
         vehicles,
         drivers,
@@ -295,9 +167,7 @@ export function AppProvider({ children }) {
         login,
         signup,
         logout,
-        setUserType,
-        activatePlan,
-        updatePlan,
+        setTier,
         toggleDarkMode,
         triggerDemoAlert,
         addVehicle,

@@ -6,33 +6,25 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import './Plans.css';
 
 export default function PlansPage() {
-  const { session } = useApp();
+  const { subscriptionTier } = useApp();
   const navigate = useNavigate();
 
   return (
-    <ProtectedRoute requirePlan={false}>
+    <ProtectedRoute>
       <div className="plans-page">
         <div className="container">
           <StepIndicator currentStep={1} totalSteps={3} />
 
           <div className="plans-header">
             <h1>Choose Your Plan</h1>
-            <p>
-              {session?.userType === 'consumer'
-                ? 'Personal plans designed for individual vehicle tracking.'
-                : 'Business plans built for fleet management at any scale.'}
-            </p>
+            <p>Select the plan that fits your fleet's needs.</p>
           </div>
 
           <PricingCards
-            onPlanSelect={(tier, billingCycle) => {
-              sessionStorage.setItem(
-                'trackin_id_pending_plan',
-                JSON.stringify({ plan: tier, billingCycle })
-              );
-              navigate('/checkout');
+            onPlanSelect={(tier) => {
+              navigate(`/checkout?plan=${tier}`);
             }}
-            userType={session?.userType}
+            userType={null}
           />
         </div>
       </div>
