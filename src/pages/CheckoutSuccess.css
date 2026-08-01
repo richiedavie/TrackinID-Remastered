@@ -1,0 +1,53 @@
+.success-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  padding: 24px;
+}
+
+.success-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 48px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+.success-icon {
+  margin-bottom: 24px;
+}
+
+.success-card h1 {
+  margin-bottom: 8px;
+}
+
+.success-message {
+  margin-bottom: 32px;
+}
+
+.success-details {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.detail-row span {
+  color: var(--text-secondary);
+}
+
+.success-redirect {
+  margin-top: 24px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

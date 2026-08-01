@@ -48,6 +48,9 @@
 
 .pricing-grid {
   align-items: stretch;
+  margin-top: 3rem;
+  display: grid;
+  gap: 24px;
 }
 
 .pricing-card {
@@ -60,19 +63,19 @@
   border-color: var(--text-primary);
 }
 
-.popular-badge {
+.popular-badge,
+.recommended-badge {
   position: absolute;
-  top: -12px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--text-primary);
-  color: var(--surface);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.recommended-badge {
+  left: auto;
+  right: -12px;
 }
 
 .pricing-card-header {

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Hero.css';
 
 export default function Hero() {
@@ -13,8 +14,8 @@ export default function Hero() {
               Trackin.ID is an advanced technology solution designed to help you manage every aspect of your vehicle operations — efficiently and in real time.
             </p>
             <div className="hero-actions">
-              <a href="#" className="btn btn-primary">Start Now</a>
-              <a href="#" className="btn btn-outline">See the Preview</a>
+              <Link to="/signup" className="btn btn-primary">Start Now</Link>
+              <Link to="/login" className="btn btn-outline">Sign In</Link>
             </div>
           </div>
           

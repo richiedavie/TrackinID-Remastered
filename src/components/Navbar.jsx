@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, session, logout } = useApp();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,6 +16,11 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const navLinks = [
     { name: 'Home', href: '#home' },
@@ -24,9 +33,9 @@ export default function Navbar() {
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container navbar-container">
-        <a href="#home" className="navbar-logo">
+        <Link to="/" className="navbar-logo">
           Trackin.ID
-        </a>
+        </Link>
 
         {/* Desktop Menu */}
         <div className="navbar-links desktop-only">
@@ -38,11 +47,24 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-actions desktop-only">
-          <a href="#" className="btn btn-primary">Start Free Trial</a>
+          {isAuthenticated ? (
+            <div className="navbar-auth">
+              <span className="navbar-user">
+                {session?.name} ({session?.plan})
+              </span>
+              <button className="btn btn-outline btn-sm" onClick={handleLogout}>
+                Log out
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-primary">
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile Toggle */}
-        <button 
+        <button
           className="mobile-menu-toggle"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
@@ -69,9 +91,9 @@ export default function Navbar() {
         <div className="mobile-menu">
           <div className="container">
             {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
+              <a
+                key={link.name}
+                href={link.href}
                 className="mobile-nav-link"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -79,7 +101,20 @@ export default function Navbar() {
               </a>
             ))}
             <div className="mobile-actions">
-              <a href="#" className="btn btn-primary w-full">Start Free Trial</a>
+              {isAuthenticated ? (
+                <>
+                  <span className="mobile-user">
+                    {session?.name} ({session?.plan})
+                  </span>
+                  <button className="btn btn-outline w-full" onClick={handleLogout}>
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="btn btn-primary w-full" onClick={() => setMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </div>

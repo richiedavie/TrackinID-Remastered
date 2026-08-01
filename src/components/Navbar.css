@@ -73,8 +73,33 @@
   margin-top: 24px;
 }
 
+.mobile-user {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-user {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 .w-full {
   width: 100%;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
