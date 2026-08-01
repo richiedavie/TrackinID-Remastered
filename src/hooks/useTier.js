@@ -3,24 +3,21 @@ import { TIERS } from '../config/tiers';
 
 export function useTier() {
   const { subscriptionTier } = useApp();
-  const tier = subscriptionTier ? TIERS[subscriptionTier] : null;
+  const currentTier = TIERS[subscriptionTier] || TIERS.basic;
 
-  const canAccess = (feature) => {
-    if (!tier || !tier.features) return false;
-    return tier.features[feature] !== false && tier.features[feature] !== undefined;
+  const maxVehiclesAllowed = currentTier.maxVehicles;
+  const canAccessPredictiveMaintenance = Boolean(currentTier.features?.aiPredictiveMaintenance);
+  const canAccessRouteOptimization = Boolean(currentTier.features?.aiRouteOptimization);
+  const canAccessVideoTelematics = Boolean(currentTier.features?.videoTelematics);
+  const canAccessReports = Boolean(currentTier.features?.reports);
+
+  return {
+    subscriptionTier,
+    currentTier,
+    maxVehiclesAllowed,
+    canAccessPredictiveMaintenance,
+    canAccessRouteOptimization,
+    canAccessVideoTelematics,
+    canAccessReports,
   };
-
-  const getFeatureValue = (feature) => {
-    if (!tier || !tier.features) return false;
-    return tier.features[feature];
-  };
-
-  const isVehicleCapReached = (count) => {
-    if (!tier) return true;
-    return count >= tier.maxVehicles;
-  };
-
-  const currentTier = tier;
-
-  return { canAccess, getFeatureValue, isVehicleCapReached, currentTier };
 }

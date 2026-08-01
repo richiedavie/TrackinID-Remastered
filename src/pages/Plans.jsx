@@ -1,33 +1,36 @@
-import { useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
+import { useState } from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import PricingCards from '../components/PricingCards';
-import StepIndicator from '../components/StepIndicator';
-import ProtectedRoute from '../components/ProtectedRoute';
 import './Plans.css';
 
-export default function PlansPage() {
-  const { subscriptionTier } = useApp();
-  const navigate = useNavigate();
+export default function Plans() {
+  const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <ProtectedRoute>
-      <div className="plans-page">
-        <div className="container">
-          <StepIndicator currentStep={1} totalSteps={3} />
+    <div className="plans-page">
+      <Navbar />
+      <div className="container section-padding">
+        <div className="text-center plans-header">
+          <h2>Select a Subscription Plan</h2>
+          <p>Choose the tier that matches your vehicle fleet size and capability requirements.</p>
 
-          <div className="plans-header">
-            <h1>Choose Your Plan</h1>
-            <p>Select the plan that fits your fleet's needs.</p>
+          <div className="pricing-toggle">
+            <span className={!isYearly ? 'active' : ''}>Monthly</span>
+            <button
+              className={`toggle-btn ${isYearly ? 'active' : ''}`}
+              onClick={() => setIsYearly(!isYearly)}
+              aria-label="Toggle billing frequency"
+            >
+              <div className="toggle-slider" />
+            </button>
+            <span className={isYearly ? 'active' : ''}>Yearly (Save 20%)</span>
           </div>
-
-          <PricingCards
-            onPlanSelect={(tier) => {
-              navigate(`/checkout?plan=${tier}`);
-            }}
-            userType={null}
-          />
         </div>
+
+        <PricingCards isYearly={isYearly} />
       </div>
-    </ProtectedRoute>
+      <Footer />
+    </div>
   );
 }

@@ -4,7 +4,7 @@ import './Toast.css';
 export default function Toast() {
   const { toasts, removeToast } = useApp();
 
-  if (toasts.length === 0) return null;
+  if (!toasts || toasts.length === 0) return null;
 
   return (
     <div className="toast-container">

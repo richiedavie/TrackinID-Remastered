@@ -1,19 +1,9 @@
 .plans-page {
-  min-height: 100vh;
+  padding-top: 100px;
+  min-height: 100dvh;
   background-color: var(--bg-primary);
-  padding: 48px 0;
 }
 
 .plans-header {
-  text-align: center;
   margin-bottom: 48px;
-}
-
-.plans-header h1 {
-  margin-bottom: 8px;
-}
-
-.plans-header p {
-  color: var(--text-secondary);
-  margin: 0;
 }

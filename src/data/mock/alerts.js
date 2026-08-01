@@ -1,46 +1,32 @@
-export const initialAlerts = [
+export const alerts = [
   {
     id: 'a1',
-    type: 'geofence', // geofence, speed, maintenance, theft, engine
-    title: 'Geofence Exit Violation',
-    message: 'Executive Sedan #02 exited assigned zone (Tanah Abang Depot).',
-    severity: 'critical', // info, warning, critical
-    vehicle: 'Executive Sedan #02',
-    timestamp: '10 mins ago',
-    sentViaChannels: true,
-    read: false
+    type: 'security',
+    message: 'Geofence Exit Violation: Vehicle BYD-typeshi exited Bandung hub.',
+    timestamp: '2 hours ago',
+    isRead: false
   },
   {
     id: 'a2',
-    type: 'speed',
-    title: 'Excessive Speed Warning',
-    message: 'Heavy Truck TX-04 exceeded speed limit (82 km/h in 60 zone).',
-    severity: 'warning',
-    vehicle: 'Heavy Truck TX-04',
-    timestamp: '45 mins ago',
-    sentViaChannels: true,
-    read: false
+    type: 'maintenance',
+    message: 'Oil Change & Brake pads inspection required for B 8899 FLT.',
+    timestamp: '5 hours ago',
+    isRead: false
   },
   {
     id: 'a3',
-    type: 'maintenance',
-    title: 'Scheduled Brake Service Due',
-    message: 'Logistics Van #01 has reached 40% brake efficiency rating.',
-    severity: 'info',
-    vehicle: 'Logistics Van #01',
-    timestamp: '2 hours ago',
-    sentViaChannels: false,
-    read: true
+    type: 'security',
+    message: 'Sudden acceleration / harsh braking event logged by Rusdih on Route 4.',
+    timestamp: '1 day ago',
+    isRead: true
   },
   {
     id: 'a4',
-    type: 'engine',
-    title: 'Battery Voltage Low',
-    message: 'Heavy Truck TX-04 reported low battery voltage (11.4V).',
-    severity: 'warning',
-    vehicle: 'Heavy Truck TX-04',
-    timestamp: '5 hours ago',
-    sentViaChannels: true,
-    read: true
+    type: 'maintenance',
+    message: 'Tire pressure low warning on D 4567 LGT.',
+    timestamp: '2 days ago',
+    isRead: true
   }
 ];
+
+export const initialAlerts = alerts;

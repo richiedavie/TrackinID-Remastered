@@ -1,77 +1,104 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import StepIndicator from '../components/StepIndicator';
 import './Onboarding.css';
 
 export default function Onboarding() {
-  const [selectedType, setSelectedType] = useState(null);
-  const { setUserType } = useApp();
+  const [step, setStep] = useState(1);
+  const [selectedTrack, setSelectedTrack] = useState('business');
+  const [loadingStep, setLoadingStep] = useState(0);
+  const { setUserType, login } = useApp();
   const navigate = useNavigate();
 
-  const handleContinue = () => {
-    if (!selectedType) return;
-    setUserType(selectedType);
-    navigate('/plans', { replace: true });
+  const loadingMessages = [
+    'Verifying device ID & telematics frequency...',
+    'Syncing location GPS signals...',
+    'Finalizing account configuration...'
+  ];
+
+  useEffect(() => {
+    if (step === 2) {
+      const interval = setInterval(() => {
+        setLoadingStep((prev) => {
+          if (prev >= 2) {
+            clearInterval(interval);
+            setTimeout(() => {
+              login();
+              navigate('/dashboard');
+            }, 600);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 900);
+
+      return () => clearInterval(interval);
+    }
+  }, [step, login, navigate]);
+
+  const handleTrackSubmit = () => {
+    setUserType(selectedTrack);
+    setStep(2);
   };
 
   return (
     <div className="onboarding-page">
-      <div className="container">
-        <StepIndicator currentStep={0} totalSteps={3} />
+      <div className="onboarding-card">
+        <StepIndicator currentStep={step === 1 ? 2 : 3} />
 
-        <div className="onboarding-card">
-          <h1 className="onboarding-title">Get Started</h1>
-          <p className="onboarding-subtitle">
-            Are you tracking a personal vehicle or managing a fleet?
-          </p>
+        {step === 1 ? (
+          <div>
+            <h2 style={{ textAlign: 'center', marginBottom: '8px' }}>What are you tracking?</h2>
+            <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+              Select your track to customize dashboard metrics and scaling tools.
+            </p>
 
-          <div className="onboarding-options">
-            <div
-              className={`onboarding-option ${selectedType === 'consumer' ? 'selected' : ''}`}
-              onClick={() => setSelectedType('consumer')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setSelectedType('consumer')}
-            >
-              <div className="option-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M12 2v4m0 12v4M2 12h4m12 0h4"></path>
-                  <path d="m4.93 4.93 2.83 2.83m8.48 8.48 2.83 2.83m0-14.14-2.83 2.83M4.93 19.07l2.83-2.83"></path>
-                </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+              <div
+                className={`track-option-card ${selectedTrack === 'business' ? 'active' : ''}`}
+                onClick={() => setSelectedTrack('business')}
+              >
+                <div className="track-option-icon">🚚</div>
+                <div>
+                  <h4 style={{ margin: 0 }}>Business / Fleet Track</h4>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>
+                    Logistics, delivery fleets, or rental car operations managing multiple vehicles & drivers.
+                  </p>
+                </div>
               </div>
-              <h3>Personal Vehicle</h3>
-              <p>Track a single car with real-time GPS, alerts, and maintenance reminders.</p>
+
+              <div
+                className={`track-option-card ${selectedTrack === 'consumer' ? 'active' : ''}`}
+                onClick={() => setSelectedTrack('consumer')}
+              >
+                <div className="track-option-icon">🚗</div>
+                <div>
+                  <h4 style={{ margin: 0 }}>Consumer / Individual Track</h4>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>
+                    Tracking 1 personal vehicle, family car, or single asset.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div
-              className={`onboarding-option ${selectedType === 'business' ? 'selected' : ''}`}
-              onClick={() => setSelectedType('business')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setSelectedType('business')}
-            >
-              <div className="option-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                  <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>
-                  <line x1="12" y1="12" x2="12" y2="12"></line>
-                </svg>
-              </div>
-              <h3>Fleet / Business</h3>
-              <p>Manage multiple vehicles, drivers, and teams with advanced analytics.</p>
+            <button onClick={handleTrackSubmit} className="btn btn-primary w-full">
+              Connecting GPS Device →
+            </button>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <h3 style={{ marginBottom: '12px' }}>Connecting your GPS Device...</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>{loadingMessages[loadingStep]}</p>
+
+            <div className="progress-bar-bg">
+              <div
+                className="progress-bar-fill"
+                style={{ width: `${((loadingStep + 1) / 3) * 100}%` }}
+              />
             </div>
           </div>
-
-          <button
-            className="btn btn-primary w-full"
-            onClick={handleContinue}
-            disabled={!selectedType}
-          >
-            Continue
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

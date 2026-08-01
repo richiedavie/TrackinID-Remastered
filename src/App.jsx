@@ -1,55 +1,68 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
-import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
-import PlansPage from './pages/Plans';
+import Signup from './pages/Signup';
+import Plans from './pages/Plans';
 import Checkout from './pages/Checkout';
 import CheckoutSuccess from './pages/CheckoutSuccess';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
-import BillingPage from './pages/Billing';
-import Pricing from './components/Pricing';
-import Footer from './components/Footer';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import DashboardHighlight from './components/DashboardHighlight';
-import Benefits from './components/Benefits';
-import Testimonials from './components/Testimonials';
-import FAQ from './components/FAQ';
+import Billing from './pages/Billing';
 
 import './App.css';
 
 function App() {
   return (
     <AppProvider>
-      <BrowserRouter>
-        <Navbar />
+      <Router>
         <Routes>
-          <Route path="/" element={
-            <>
-              <main>
-                <Hero />
-                <Features />
-                <DashboardHighlight />
-                <Benefits />
-                <Testimonials />
-                <Pricing />
-                <FAQ />
-              </main>
-              <Footer />
-            </>
-          } />
-
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Login />} />
-          <Route path="/plans" element={<PlansPage />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/success" element={<CheckoutSuccess />} />
-          <Route path="/billing" element={<BillingPage />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/onboarding" element={<Onboarding />} />
 
+          {/* Protected Routes */}
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout-success"
+            element={
+              <ProtectedRoute>
+                <CheckoutSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/billing"
+            element={
+              <ProtectedRoute>
+                <Billing />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AppProvider>
   );
 }

@@ -1,76 +1,54 @@
 .onboarding-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  padding: 32px 16px;
   background-color: var(--bg-primary);
-  padding: 48px 24px;
 }
 
 .onboarding-card {
+  width: 100%;
+  max-width: 520px;
   background-color: var(--surface);
   border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 36px 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.track-option-card {
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 40px;
-  width: 100%;
-  max-width: 640px;
-}
-
-.onboarding-title {
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.onboarding-subtitle {
-  text-align: center;
-  margin-bottom: 32px;
-  color: var(--text-secondary);
-}
-
-.onboarding-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.onboarding-option {
-  background-color: var(--bg-primary);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 24px;
+  padding: 20px;
   cursor: pointer;
-  text-align: center;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
   transition: all 0.2s ease;
-}
-
-.onboarding-option:hover {
-  border-color: var(--text-secondary);
-}
-
-.onboarding-option.selected {
-  border-color: var(--accent);
   background-color: var(--surface);
-  box-shadow: 0 0 0 1px var(--accent);
 }
 
-.onboarding-option h3 {
-  margin: 12px 0 8px;
-  font-size: 1.125rem;
+.track-option-card.active {
+  border: 2px solid var(--accent);
+  background-color: var(--bg-alternate);
 }
 
-.onboarding-option p {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin: 0;
+.track-option-icon {
+  font-size: 1.5rem;
 }
 
-.option-icon {
-  color: var(--accent);
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px 0;
 }
 
-@media (max-width: 768px) {
-  .onboarding-options {
-    grid-template-columns: 1fr;
-  }
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--accent);
+  transition: width 0.3s ease;
 }

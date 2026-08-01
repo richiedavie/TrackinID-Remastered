@@ -1,85 +1,74 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
+import { useNavigate, Link } from 'react-router-dom';
 import './AuthPage.css';
 
 export default function Signup() {
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { signup } = useApp();
+  const [company, setCompany] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      setError('Please fill in all fields.');
-      return;
-    }
-    if (password.length < 4) {
-      setError('Password must be at least 4 characters.');
-      return;
-    }
-    signup(name, email, password);
-    navigate('/onboarding', { replace: true });
+    navigate('/onboarding');
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">
-          <span className="logo-text">Trackin.ID</span>
+        <div className="auth-header">
+          <Link to="/" className="auth-logo">Trackin.ID</Link>
+          <p className="auth-subtitle">Create your fleet management account</p>
         </div>
-        <h1 className="auth-title">Create Account</h1>
-        <p className="auth-subtitle">Get started with your free demo</p>
-
-        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="fullName">Full Name</label>
             <input
-              id="name"
+              id="fullName"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              autoComplete="name"
-              autoFocus
+              className="form-input"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Rusdih Operations"
+              required
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Work Email</label>
             <input
               id="email"
               type="email"
+              className="form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
+              placeholder="rusdih@company.com"
+              required
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="company">Company / Fleet Name</label>
             <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              autoComplete="new-password"
+              id="company"
+              type="text"
+              className="form-input"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="PT Bandung Transport"
+              required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-full">
-            Create Account
+
+          <button type="submit" className="btn btn-primary w-full" style={{ marginTop: '8px' }}>
+            Continue to Onboarding
           </button>
         </form>
 
-        <p className="auth-switch">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
+        <div className="auth-footer-text">
+          Already have an account? <Link to="/login">Log in</Link>
+        </div>
       </div>
     </div>
   );

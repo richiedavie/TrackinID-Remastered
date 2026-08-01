@@ -1,30 +1,20 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { initialVehicles } from '../data/mock/vehicles';
-import { initialDrivers } from '../data/mock/drivers';
-import { initialAlerts } from '../data/mock/alerts';
-import { initialMaintenance } from '../data/mock/maintenance';
-import { initialTeam } from '../data/mock/team';
-import { TIERS } from '../config/tiers';
 
 const AppContext = createContext();
 
-const STORAGE_KEY = 'trackin_id_session_v1';
+const STORAGE_KEY = 'trackin_id_app_state_v2';
 
 export function AppProvider({ children }) {
-  const savedState = localStorage.getItem(STORAGE_KEY);
-  const initial = savedState ? JSON.parse(savedState) : null;
+  const saved = localStorage.getItem(STORAGE_KEY);
+  const parsed = saved ? JSON.parse(saved) : null;
 
-  const [isAuthenticated, setIsAuthenticated] = useState(initial?.isAuthenticated ?? false);
-  const [user, setUser] = useState(initial?.user ?? null);
-  const [subscriptionTier, setSubscriptionTier] = useState(initial?.subscriptionTier ?? null);
-  const [darkMode, setDarkMode] = useState(initial?.darkMode ?? false);
-
-  const [vehicles, setVehicles] = useState(initial?.vehicles ?? initialVehicles);
-  const [drivers, setDrivers] = useState(initial?.drivers ?? initialDrivers);
-  const [alerts, setAlerts] = useState(initial?.alerts ?? initialAlerts);
-  const [maintenance, setMaintenance] = useState(initial?.maintenance ?? initialMaintenance);
-  const [team, setTeam] = useState(initial?.team ?? initialTeam);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(parsed?.isAuthenticated ?? true);
+  const [user, setUser] = useState(
+    parsed?.user ?? { name: 'Rusdih Operations', email: 'rusdih@trackin.id', role: 'Fleet Manager' }
+  );
+  const [subscriptionTier, setSubscriptionTier] = useState(parsed?.subscriptionTier ?? 'pro');
+  const [userType, setUserType] = useState(parsed?.userType ?? 'business');
+  const [darkMode, setDarkMode] = useState(parsed?.darkMode ?? false);
   const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
@@ -34,15 +24,11 @@ export function AppProvider({ children }) {
         isAuthenticated,
         user,
         subscriptionTier,
+        userType,
         darkMode,
-        vehicles,
-        drivers,
-        alerts,
-        maintenance,
-        team,
       })
     );
-  }, [isAuthenticated, user, subscriptionTier, darkMode, vehicles, drivers, alerts, maintenance, team]);
+  }, [isAuthenticated, user, subscriptionTier, userType, darkMode]);
 
   useEffect(() => {
     if (darkMode) {
@@ -52,53 +38,13 @@ export function AppProvider({ children }) {
     }
   }, [darkMode]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setVehicles((prev) =>
-        prev.map((v) => {
-          if (v.status !== 'online') return v;
-          const latNudge = (Math.random() - 0.5) * 0.001;
-          const lngNudge = (Math.random() - 0.5) * 0.001;
-          return {
-            ...v,
-            location: {
-              ...v.location,
-              lat: v.location.lat + latNudge,
-              lng: v.location.lng + lngNudge,
-            },
-          };
-        })
-      );
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const login = (email, password) => {
-    const mockUser = {
-      id: 'u_1',
-      name: email.split('@')[0],
-      email,
-    };
-    setUser(mockUser);
+  const login = (userData) => {
     setIsAuthenticated(true);
-    return mockUser;
-  };
-
-  const signup = (name, email, password) => {
-    const mockUser = {
-      id: 'u_1',
-      name,
-      email,
-    };
-    setUser(mockUser);
-    setIsAuthenticated(true);
-    return mockUser;
+    if (userData) setUser(userData);
   };
 
   const logout = () => {
-    setUser(null);
     setIsAuthenticated(false);
-    setSubscriptionTier(null);
   };
 
   const setTier = (tier) => {
@@ -113,42 +59,12 @@ export function AppProvider({ children }) {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
+      removeToast(id);
     }, 4000);
   };
 
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const triggerDemoAlert = () => {
-    const randomVehicle = vehicles[Math.floor(Math.random() * vehicles.length)] || initialVehicles[0];
-    const newAlert = {
-      id: `a_${Date.now()}`,
-      type: 'security',
-      message: `${randomVehicle.name} sudden acceleration detected on route.`,
-      timestamp: 'Just now',
-      isRead: false,
-    };
-    setAlerts((prev) => [newAlert, ...prev]);
-    addToast(`ALERT: ${newAlert.message}`, 'warning');
-  };
-
-  const addVehicle = (newVeh) => {
-    setVehicles((prev) => [newVeh, ...prev]);
-    addToast(`Added vehicle ${newVeh.name}`, 'success');
-  };
-
-  const markMaintenanceDone = (id) => {
-    setMaintenance((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, status: 'done', progressPct: 100 } : m))
-    );
-    addToast('Maintenance task marked as completed.', 'success');
-  };
-
-  const inviteTeamMember = (member) => {
-    setTeam((prev) => [...prev, { ...member, id: `t_${Date.now()}`, status: 'Active', joinedDate: 'Just now' }]);
-    addToast(`Invited ${member.email} as ${member.role}`, 'success');
   };
 
   return (
@@ -157,22 +73,14 @@ export function AppProvider({ children }) {
         isAuthenticated,
         user,
         subscriptionTier,
+        userType,
         darkMode,
-        vehicles,
-        drivers,
-        alerts,
-        maintenance,
-        team,
         toasts,
         login,
-        signup,
         logout,
         setTier,
+        setUserType,
         toggleDarkMode,
-        triggerDemoAlert,
-        addVehicle,
-        markMaintenanceDone,
-        inviteTeamMember,
         addToast,
         removeToast,
       }}

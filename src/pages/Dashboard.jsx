@@ -1,315 +1,461 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useTier } from '../hooks/useTier';
 import Gate from '../components/Gate';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { TIERS } from '../config/tiers';
+import Toast from '../components/Toast';
+
+import { vehicles } from '../data/mock/vehicles';
+import { drivers } from '../data/mock/drivers';
+import { alerts } from '../data/mock/alerts';
+import { maintenance } from '../data/mock/maintenance';
+
 import './Dashboard.css';
 
 export default function Dashboard() {
-  const { user, subscriptionTier, vehicles, alerts, maintenance, team, triggerDemoAlert, logout } = useApp();
   const [activeTab, setActiveTab] = useState('overview');
-
-  const tier = subscriptionTier ? TIERS[subscriptionTier] : null;
-
-  const menuItems = [
-    { id: 'overview', label: 'Overview', icon: 'home' },
-    { id: 'vehicles', label: 'Vehicle Management', icon: 'car' },
-    { id: 'drivers', label: 'Driver Management', icon: 'user' },
-    { id: 'maintenance', label: 'Maintenance Schedule', icon: 'wrench' },
-    { id: 'tracking', label: 'Real-Time Tracking', icon: 'map-pin' },
-    { id: 'reports', label: 'Reports & Analytics', icon: 'bar-chart' },
-    { id: 'settings', label: 'Settings & Account', icon: 'gear' },
-    { id: 'logout', label: 'Logout', icon: 'lock' },
-  ];
+  const { user, logout, toggleDarkMode, darkMode, subscriptionTier } = useApp();
+  const { currentTier } = useTier();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    navigate('/login');
   };
 
-  const getIcon = (iconName) => {
-    switch (iconName) {
-      case 'home':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-        );
-      case 'car':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="1" y="3" width="21" height="16" rx="2" ry="2"></rect>
-            <line x1="1" y1="12" x2="23" y2="12"></line>
-            <circle cx="5.5" cy="18.5" r="2.5"></circle>
-            <circle cx="18.5" cy="18.5" r="2.5"></circle>
-          </svg>
-        );
-      case 'user':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        );
-      case 'wrench':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-          </svg>
-        );
-      case 'map-pin':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-        );
-      case 'bar-chart':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-        );
-      case 'gear':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        );
-      case 'lock':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        );
-      default:
-        return null;
-    }
-  };
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: '🏠', color: '#ffffff' },
+    { id: 'vehicles', label: 'Vehicle Management', icon: '🚘', color: '#e53e3e' }, // Red car
+    { id: 'drivers', label: 'Driver Management', icon: '👤', color: '#3182ce' }, // Blue user
+    { id: 'maintenance', label: 'Maintenance Schedule', icon: '🛠️', color: '#dd6b20' }, // Wrenches
+    { id: 'tracking', label: 'Real-Time Tracking', icon: '📍', color: '#e53e3e' }, // Red map pin
+    { id: 'reports', label: 'Reports & Analytics', icon: '📊', color: '#38a169' }, // Bar chart
+    { id: 'settings', label: 'Settings & Account', icon: '⚙️', color: '#cbd5e0' }, // Gear
+    { id: 'logout', label: 'Logout', icon: '🔒', color: '#d69e2e' } // Yellow padlock
+  ];
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="dashboard-overview">
-            <h1>Dashboard Overview</h1>
-            <div className="overview-cards">
-              <div className="overview-card">
-                <h3>Current Plan</h3>
-                <p className="plan-name">{tier?.name || 'No plan'}</p>
-                <p className="plan-detail">
-                  {subscriptionTier ? 'Active' : 'No active plan'}
-                </p>
-                <Link to="/billing" className="btn btn-outline btn-sm">
-                  Manage Plan
-                </Link>
-              </div>
-              <div className="overview-card">
-                <h3>Vehicles</h3>
-                <p className="stat-number">{vehicles.length}</p>
-                <p className="stat-detail">
-                  Max: {tier?.maxVehicles === Infinity ? 'Unlimited' : tier?.maxVehicles || 0}
-                </p>
-              </div>
-              <div className="overview-card">
-                <h3>Active Alerts</h3>
-                <p className="stat-number">{alerts.filter((a) => !a.isRead).length}</p>
-                <p className="stat-detail">Unread alerts</p>
-              </div>
-              <div className="overview-card">
-                <h3>Team Members</h3>
-                <p className="stat-number">{team.length}</p>
-                <p className="stat-detail">Active users</p>
-              </div>
-            </div>
-
-            <Gate feature="driverBehavior">
-              <div className="dashboard-section">
-                <h2>Driver Behavior Analytics</h2>
-                <p>This feature is available on your current plan.</p>
-              </div>
-            </Gate>
-
-            <Gate feature="aiPredictiveMaintenance">
-              <div className="dashboard-section">
-                <h2>AI Predictive Maintenance</h2>
-                <p>AI-powered maintenance predictions are available on your plan.</p>
-              </div>
-            </Gate>
-
-            <Gate feature="videoTelematics">
-              <div className="dashboard-section">
-                <h2>Video Telematics</h2>
-                <p>Live video feeds and telematics are available on your plan.</p>
-              </div>
-            </Gate>
-          </div>
-        );
-
-      case 'vehicles':
-        return (
-          <div className="dashboard-section">
-            <h1>Vehicle Management</h1>
-            <div className="vehicle-list">
-              {vehicles.map((v) => (
-                <div key={v.id} className="card vehicle-card">
-                  <div className="vehicle-card-header">
-                    <h3>{v.name}</h3>
-                    <span className={`status-badge ${v.status}`}>{v.status}</span>
-                  </div>
-                  <div className="vehicle-card-details">
-                    <p>Plate: {v.plate}</p>
-                    <p>Location: {v.location?.address || `${v.location.lat.toFixed(4)}, ${v.location.lng.toFixed(4)}`}</p>
-                    <p>Speed: {v.speed} km/h | Fuel: {v.fuel}%</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'drivers':
-        return (
-          <div className="dashboard-section">
-            <h1>Driver Management</h1>
-            <div className="driver-list">
-              {team.map((d) => (
-                <div key={d.id} className="card driver-card">
-                  <div className="driver-card-header">
-                    <div className="driver-avatar">{d.name.charAt(0)}</div>
-                    <div>
-                      <strong>{d.name}</strong>
-                      <span className="driver-role">{d.role}</span>
-                    </div>
-                  </div>
-                  <p className="driver-email">{d.email}</p>
-                  <span className={`status-badge ${d.status === 'Active' ? 'online' : 'offline'}`}>{d.status}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'maintenance':
-        return (
-          <div className="dashboard-section">
-            <h1>Maintenance Schedule</h1>
-            <div className="maintenance-list">
-              {maintenance.map((m) => (
-                <div key={m.id} className="card maintenance-card">
-                  <div className="maintenance-card-header">
-                    <strong>{m.serviceType}</strong>
-                    <span className={`severity-badge ${m.status}`}>{m.status}</span>
-                  </div>
-                  <p>Vehicle: {m.vehicle}</p>
-                  <p>Due: {m.dueDate} | Est. Cost: {m.estimatedCost}</p>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${m.progressPct}%` }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'tracking':
-        return (
-          <div className="dashboard-section">
-            <h1>Real-Time Tracking</h1>
-            <p>Live vehicle tracking is available on your current plan.</p>
-            <div className="vehicle-list">
-              {vehicles.filter((v) => v.status === 'online').map((v) => (
-                <div key={v.id} className="card vehicle-card">
-                  <div className="vehicle-card-header">
-                    <h3>{v.name}</h3>
-                    <span className="status-badge online">Tracking</span>
-                  </div>
-                  <p>Speed: {v.speed} km/h | Fuel: {v.fuel}%</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'reports':
-        return (
-          <div className="dashboard-section">
-            <h1>Reports & Analytics</h1>
-            <p>Detailed analytics and reports are available on your plan.</p>
-            <div className="card">
-              <p>Generate fleet reports, cost analysis, and driver performance summaries.</p>
-            </div>
-          </div>
-        );
-
-      case 'settings':
-        return (
-          <div className="dashboard-section">
-            <h1>Settings & Account</h1>
-            <div className="card">
-              <p><strong>Name:</strong> {user?.name || 'N/A'}</p>
-              <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
-              <p><strong>Plan:</strong> {tier?.name || 'None'}</p>
-            </div>
-          </div>
-        );
-
-      case 'logout':
-        handleLogout();
-        return null;
-
-      default:
-        return null;
+  const handleNavClick = (id) => {
+    if (id === 'logout') {
+      handleLogout();
+    } else {
+      setActiveTab(id);
     }
   };
 
   return (
-    <ProtectedRoute>
-      <div className="dashboard-page">
-        <aside className="dashboard-sidebar">
-          <div className="sidebar-brand">
-            <Link to="/" className="logo-text">Trackin.ID</Link>
+    <div className="dashboard-grid-layout">
+      <Toast />
+
+      {/* Sidebar */}
+      <aside className="dashboard-sidebar">
+        <div>
+          <div className="sidebar-header">
+            <div className="sidebar-brand">
+              <span>Trackin.ID</span>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#a0aec0', marginTop: '4px' }}>
+              Tier: <strong style={{ color: '#ffffff' }}>{currentTier.name}</strong>
+            </div>
           </div>
+
           <nav className="sidebar-nav">
-            {menuItems.map((item) => {
+            {navItems.map((item) => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
-                  className={`sidebar-item ${isActive ? 'active' : ''}`}
-                  onClick={() => {
-                    if (item.id === 'logout') {
-                      handleLogout();
-                    } else {
-                      setActiveTab(item.id);
-                    }
-                  }}
+                  className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
+                  onClick={() => handleNavClick(item.id)}
                 >
-                  <span className="sidebar-icon">{getIcon(item.icon)}</span>
-                  <span className="sidebar-label">{item.label}</span>
+                  <span className="nav-icon" style={{ color: isActive ? '#ffffff' : item.color }}>
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
                 </button>
               );
             })}
           </nav>
-        </aside>
+        </div>
 
-        <main className="dashboard-main">
-          <header className="dashboard-header">
-            <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
-            <div className="header-actions">
-              <span className="user-info">
-                {user?.name} ({subscriptionTier})
-              </span>
+        <div className="sidebar-footer">
+          <div className="user-mini-card">
+            <strong>{user.name}</strong>
+            <span>{user.email}</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Area */}
+      <main className="dashboard-main">
+        {/* Topbar */}
+        <div className="dashboard-topbar">
+          <div className="dashboard-title-group">
+            <h1>
+              {navItems.find((n) => n.id === activeTab)?.label || 'Dashboard Overview'}
+            </h1>
+            <p>Real-time vehicle telemetry & fleet operation management</p>
+          </div>
+
+          <div className="dashboard-actions">
+            <button
+              onClick={toggleDarkMode}
+              className="btn btn-outline"
+              style={{ padding: '8px 14px', fontSize: '0.85rem' }}
+            >
+              {darkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <button
+              onClick={() => navigate('/plans')}
+              className="btn btn-primary"
+              style={{ padding: '8px 14px', fontSize: '0.85rem' }}
+            >
+              Manage Plan
+            </button>
+          </div>
+        </div>
+
+        {/* Tab 1: Overview */}
+        {activeTab === 'overview' && (
+          <div>
+            <div className="metrics-row">
+              <div className="metric-card">
+                <div className="metric-card-title">Vehicles Active</div>
+                <div className="metric-card-value">{vehicles.length}</div>
+                <span style={{ fontSize: '0.8rem', color: '#38a169' }}>3 moving • 2 idle</span>
+              </div>
+              <div className="metric-card">
+                <div className="metric-card-title">Active Drivers</div>
+                <div className="metric-card-value">{drivers.length}</div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>All drivers assigned</span>
+              </div>
+              <div className="metric-card">
+                <div className="metric-card-title">Alerts Today</div>
+                <div className="metric-card-value">{alerts.length}</div>
+                <span style={{ fontSize: '0.8rem', color: '#e53e3e' }}>2 unread security alerts</span>
+              </div>
+              <div className="metric-card">
+                <div className="metric-card-title">Maintenance Due</div>
+                <div className="metric-card-value">{maintenance.filter((m) => m.status !== 'Completed').length}</div>
+                <span style={{ fontSize: '0.8rem', color: '#dd6b20' }}>1 overdue service</span>
+              </div>
             </div>
-          </header>
-          {renderContent()}
-        </main>
-      </div>
-    </ProtectedRoute>
+
+            <div className="grid grid-cols-2" style={{ marginBottom: '32px' }}>
+              {/* Recent Alerts Feed */}
+              <div className="card">
+                <h4 style={{ marginBottom: '16px' }}>Recent Security & Maintenance Alerts</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {alerts.map((alt) => (
+                    <div
+                      key={alt.id}
+                      style={{
+                        padding: '12px',
+                        borderRadius: '6px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: 'var(--bg-alternate)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{alt.message}</div>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{alt.timestamp}</span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          backgroundColor: alt.type === 'security' ? '#FED7D7' : '#FEEBC8',
+                          color: alt.type === 'security' ? '#9B2C2C' : '#9C4221',
+                          fontWeight: 600
+                        }}
+                      >
+                        {alt.type}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Vehicle Status Overview */}
+              <div className="card">
+                <h4 style={{ marginBottom: '16px' }}>Vehicle Fleet Snapshot</h4>
+                <div className="table-responsive">
+                  <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
+                        <th style={{ padding: '8px' }}>Plate</th>
+                        <th style={{ padding: '8px' }}>Location</th>
+                        <th style={{ padding: '8px' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vehicles.slice(0, 4).map((v) => (
+                        <tr key={v.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                          <td style={{ padding: '10px 8px', fontWeight: 600 }}>{v.plate}</td>
+                          <td style={{ padding: '10px 8px' }}>{v.location}</td>
+                          <td style={{ padding: '10px 8px' }}>
+                            <span
+                              style={{
+                                fontSize: '0.8rem',
+                                color: v.status === 'Shipping' ? '#38a169' : '#dd6b20'
+                              }}
+                            >
+                              ● {v.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Vehicle Management */}
+        {activeTab === 'vehicles' && (
+          <div className="card">
+            <h3 style={{ marginBottom: '20px' }}>Fleet Vehicles ({vehicles.length})</h3>
+            <div className="table-responsive">
+              <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-secondary)' }}>
+                    <th style={{ padding: '12px' }}>Plate Number</th>
+                    <th style={{ padding: '12px' }}>Vehicle Name</th>
+                    <th style={{ padding: '12px' }}>Status</th>
+                    <th style={{ padding: '12px' }}>Current Location</th>
+                    <th style={{ padding: '12px' }}>Fuel Level</th>
+                    <th style={{ padding: '12px' }}>Assigned Driver</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vehicles.map((v) => (
+                    <tr key={v.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '12px', fontWeight: 700, color: 'var(--accent)' }}>{v.plate}</td>
+                      <td style={{ padding: '12px' }}>{v.name}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            backgroundColor: v.status === 'Shipping' ? '#C6F6D5' : '#EDF2F7',
+                            color: v.status === 'Shipping' ? '#22543D' : '#4A5568'
+                          }}
+                        >
+                          {v.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px' }}>{v.location}</td>
+                      <td style={{ padding: '12px' }}>{v.fuelLevel}%</td>
+                      <td style={{ padding: '12px' }}>{v.driver}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Driver Management */}
+        {activeTab === 'drivers' && (
+          <Gate feature="driverBehavior">
+            <div className="card">
+              <h3 style={{ marginBottom: '20px' }}>Assigned Fleet Drivers</h3>
+              <div className="grid grid-cols-2">
+                {drivers.map((d) => (
+                  <div
+                    key={d.id}
+                    style={{
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      display: 'flex',
+                      gap: '16px',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <img
+                      src={d.avatar}
+                      alt={d.name}
+                      style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                    <div>
+                      <h4 style={{ margin: '0 0 4px' }}>{d.name}</h4>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{d.email}</div>
+                      <div style={{ fontSize: '0.85rem', marginTop: '6px', color: 'var(--accent)' }}>
+                        Status: <strong>{d.status}</strong> ({d.lastTrip})
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Gate>
+        )}
+
+        {/* Tab 4: Maintenance Schedule */}
+        {activeTab === 'maintenance' && (
+          <div className="card">
+            <h3 style={{ marginBottom: '20px' }}>Maintenance & Service Schedule</h3>
+            <div className="table-responsive">
+              <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-secondary)' }}>
+                    <th style={{ padding: '12px' }}>Plate</th>
+                    <th style={{ padding: '12px' }}>Service Task</th>
+                    <th style={{ padding: '12px' }}>Due Date</th>
+                    <th style={{ padding: '12px' }}>Est. Cost</th>
+                    <th style={{ padding: '12px' }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {maintenance.map((m) => (
+                    <tr key={m.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '12px', fontWeight: 600 }}>{m.plate}</td>
+                      <td style={{ padding: '12px' }}>{m.task}</td>
+                      <td style={{ padding: '12px' }}>{m.date}</td>
+                      <td style={{ padding: '12px' }}>{m.cost}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            backgroundColor:
+                              m.status === 'Completed' ? '#C6F6D5' : m.status === 'Overdue' ? '#FED7D7' : '#FEEBC8',
+                            color:
+                              m.status === 'Completed' ? '#22543D' : m.status === 'Overdue' ? '#9B2C2C' : '#9C4221'
+                          }}
+                        >
+                          {m.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Real-Time Tracking */}
+        {activeTab === 'tracking' && (
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
+              <h3 style={{ margin: 0 }}>Real-Time Live Vehicle Map</h3>
+              <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                Simulated per-second telemetry feed across Bandung & Jakarta hubs.
+              </p>
+            </div>
+            <div
+              style={{
+                width: '100%',
+                height: '420px',
+                backgroundColor: 'var(--bg-alternate)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}
+            >
+              <img
+                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1200"
+                alt="Live Telematics Map"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  left: '20px',
+                  backgroundColor: 'var(--surface)',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>📍 Vehicle BYD-typeshi</div>
+                <div style={{ fontSize: '0.8rem', color: '#38a169' }}>Speed: 0 km/h (Idle at Bandung Hub)</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 6: Reports & Analytics */}
+        {activeTab === 'reports' && (
+          <Gate feature="reports">
+            <div className="card">
+              <h3 style={{ marginBottom: '16px' }}>Fleet Analytics & Reports</h3>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                Operational efficiency and fuel consumption trend analysis.
+              </p>
+
+              <div
+                style={{
+                  height: '240px',
+                  backgroundColor: 'var(--bg-alternate)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px solid var(--border)',
+                  marginBottom: '24px'
+                }}
+              >
+                <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  [ Interactive Chart: Fuel vs Route Efficiency ]
+                </span>
+              </div>
+
+              <div
+                style={{
+                  padding: '16px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--bg-alternate)',
+                  border: '1px solid var(--border)'
+                }}
+              >
+                <h4 style={{ margin: '0 0 8px' }}>🤖 AI Operational Insight Summary</h4>
+                <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.6' }}>
+                  Fleet efficiency improved <strong>4.2%</strong> this month following optimized route deployments between
+                  Jakarta and Bandung. Vehicle <strong>B 8899 FLT</strong> shows elevated brake wear patterns — recommend
+                  servicing within 7 days.
+                </p>
+              </div>
+            </div>
+          </Gate>
+        )}
+
+        {/* Tab 7: Settings & Account */}
+        {activeTab === 'settings' && (
+          <div className="card" style={{ maxWidth: '640px' }}>
+            <h3 style={{ marginBottom: '24px' }}>Settings & Account Profile</h3>
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label>Account Name</label>
+              <input type="text" className="form-input" defaultValue={user.name} readOnly />
+            </div>
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label>Email Address</label>
+              <input type="email" className="form-input" defaultValue={user.email} readOnly />
+            </div>
+            <div className="form-group" style={{ marginBottom: '24px' }}>
+              <label>API Integration Key</label>
+              <input type="text" className="form-input" defaultValue="trk_live_9988234187623a" readOnly />
+            </div>
+            <button onClick={handleLogout} className="btn btn-outline" style={{ color: '#e53e3e', borderColor: '#e53e3e' }}>
+              Log Out of Account
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
