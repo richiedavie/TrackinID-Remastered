@@ -1,0 +1,26 @@
+.features-header {
+  margin-bottom: 48px;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.feature-icon {
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: inline-flex;
+}
+
+.feature-title {
+  margin-bottom: 12px;
+  font-size: 1.125rem;
+}
+
+.feature-description {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}

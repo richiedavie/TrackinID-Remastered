@@ -1,0 +1,17 @@
+.testimonial-block {
+  border-left: 3px solid var(--accent);
+  padding-left: 24px;
+}
+
+.testimonial-quote {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  font-style: italic;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.testimonial-author {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}

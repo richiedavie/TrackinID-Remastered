@@ -1,0 +1,130 @@
+.pricing-header {
+  margin-bottom: 64px;
+}
+
+.pricing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.pricing-toggle span.active {
+  color: var(--text-primary);
+}
+
+.toggle-btn {
+  width: 48px;
+  height: 24px;
+  background-color: var(--border);
+  border-radius: 12px;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-btn.active {
+  background-color: var(--accent);
+}
+
+.toggle-slider {
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggle-btn.active .toggle-slider {
+  transform: translateX(24px);
+}
+
+.pricing-grid {
+  align-items: stretch;
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pricing-card.popular {
+  border-color: var(--text-primary);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-primary);
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pricing-card-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+}
+
+.pricing-card-header h3 {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price .currency {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.price .amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.price .period {
+  color: var(--text-secondary);
+}
+
+.pricing-features {
+  flex-grow: 1;
+  margin-bottom: 32px;
+}
+
+.pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.pricing-features li svg {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
