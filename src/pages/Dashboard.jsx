@@ -14,29 +14,32 @@ import './Dashboard.css';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
-  const { user, logout, toggleDarkMode, darkMode, subscriptionTier } = useApp();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { user, logout, toggleDarkMode, darkMode } = useApp();
   const { currentTier } = useTier();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleConfirmLogout = () => {
     logout();
-    navigate('/login');
+    setShowLogoutModal(false);
+    // Redirect to Landing Page as requested
+    navigate('/');
   };
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: '🏠', color: '#ffffff' },
-    { id: 'vehicles', label: 'Vehicle Management', icon: '🚘', color: '#e53e3e' }, // Red car
-    { id: 'drivers', label: 'Driver Management', icon: '👤', color: '#3182ce' }, // Blue user
-    { id: 'maintenance', label: 'Maintenance Schedule', icon: '🛠️', color: '#dd6b20' }, // Wrenches
-    { id: 'tracking', label: 'Real-Time Tracking', icon: '📍', color: '#e53e3e' }, // Red map pin
-    { id: 'reports', label: 'Reports & Analytics', icon: '📊', color: '#38a169' }, // Bar chart
-    { id: 'settings', label: 'Settings & Account', icon: '⚙️', color: '#cbd5e0' }, // Gear
-    { id: 'logout', label: 'Logout', icon: '🔒', color: '#d69e2e' } // Yellow padlock
+    { id: 'vehicles', label: 'Vehicle Management', icon: '🚘', color: '#e53e3e' },
+    { id: 'drivers', label: 'Driver Management', icon: '👤', color: '#3182ce' },
+    { id: 'maintenance', label: 'Maintenance Schedule', icon: '🛠️', color: '#dd6b20' },
+    { id: 'tracking', label: 'Real-Time Tracking', icon: '📍', color: '#e53e3e' },
+    { id: 'reports', label: 'Reports & Analytics', icon: '📊', color: '#38a169' },
+    { id: 'settings', label: 'Settings & Account', icon: '⚙️', color: '#cbd5e0' },
+    { id: 'logout', label: 'Logout', icon: '🔒', color: '#d69e2e' }
   ];
 
   const handleNavClick = (id) => {
     if (id === 'logout') {
-      handleLogout();
+      setShowLogoutModal(true);
     } else {
       setActiveTab(id);
     }
@@ -45,6 +48,48 @@ export default function Dashboard() {
   return (
     <div className="dashboard-grid-layout">
       <Toast />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <div
+              style={{
+                fontSize: '2rem',
+                marginBottom: '12px',
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--bg-alternate)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              🔒
+            </div>
+            <h3 style={{ margin: '0 0 8px' }}>Log Out Confirmation</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0 }}>
+              Are you sure you want to log out of your Trackin.ID session? You will be redirected to the landing page.
+            </p>
+            <div className="modal-actions">
+              <button
+                className="btn btn-outline"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ backgroundColor: '#e53e3e', borderColor: '#e53e3e' }}
+                onClick={handleConfirmLogout}
+              >
+                Confirm Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sidebar */}
       <aside className="dashboard-sidebar">
@@ -450,7 +495,7 @@ export default function Dashboard() {
               <label>API Integration Key</label>
               <input type="text" className="form-input" defaultValue="trk_live_9988234187623a" readOnly />
             </div>
-            <button onClick={handleLogout} className="btn btn-outline" style={{ color: '#e53e3e', borderColor: '#e53e3e' }}>
+            <button onClick={() => setShowLogoutModal(true)} className="btn btn-outline" style={{ color: '#e53e3e', borderColor: '#e53e3e' }}>
               Log Out of Account
             </button>
           </div>

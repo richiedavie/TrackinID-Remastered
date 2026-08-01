@@ -8,7 +8,7 @@ import './Checkout.css';
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const planKey = searchParams.get('plan') || 'elite';
-  const { setTier } = useApp();
+  const { setTier, login } = useApp();
   const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState('card');
@@ -25,8 +25,9 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     setTimeout(() => {
-      // Set subscription tier in global context & localStorage
+      // Set subscription tier in global context & localStorage and authenticate
       setTier(planKey);
+      login({ name: cardHolder || 'Rusdih Operations', email: 'rusdih@trackin.id', role: 'Fleet Manager' });
       setIsSubmitting(false);
       // Strictly navigate to checkout-success / dashboard
       navigate('/checkout-success', { replace: true });

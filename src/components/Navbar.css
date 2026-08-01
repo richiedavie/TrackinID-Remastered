@@ -28,6 +28,37 @@
   letter-spacing: -0.02em;
 }
 
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle-btn {
+  background: var(--bg-alternate);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--text-secondary);
+}
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .navbar-links {
   display: flex;
   gap: 32px;

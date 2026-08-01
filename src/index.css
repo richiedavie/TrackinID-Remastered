@@ -23,14 +23,14 @@
 }
 
 :root.dark-theme {
-  --bg-primary: #141413;
-  --bg-alternate: #1C1C1A;
-  --surface: #242422;
-  --border: #383835;
-  --text-primary: #F0F0EE;
-  --text-secondary: #9E9E98;
-  --accent: #4A6382;
-  --accent-hover: #5C7AA0;
+  --bg-primary: #121211;
+  --bg-alternate: #1A1A18;
+  --surface: #222220;
+  --border: #333330;
+  --text-primary: #F4F4F2;
+  --text-secondary: #A0A09A;
+  --accent: #3182ce;
+  --accent-hover: #2b6cb0;
   color-scheme: dark;
 }
 
