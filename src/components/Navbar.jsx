@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user, subscriptionTier, logout, darkMode, toggleDarkMode } = useApp();
+  const { darkMode, toggleDarkMode, logout: appLogout } = useApp();
+  const { isAuthenticated, user, logout: authLogout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,9 +21,11 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    authLogout();
+    appLogout();
     navigate('/');
   };
+
 
   const isHome = location.pathname === '/';
 

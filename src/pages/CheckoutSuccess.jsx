@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { TIERS } from '../config/tiers';
 import './CheckoutSuccess.css';
 
 export default function CheckoutSuccess() {
-  const { subscriptionTier } = useApp();
+  const { user } = useAuth();
+  const subscriptionTier = user?.plan;
   const activeTier = TIERS[subscriptionTier] || TIERS.elite;
 
   return (

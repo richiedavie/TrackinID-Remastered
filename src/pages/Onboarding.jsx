@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import StepIndicator from '../components/StepIndicator';
 import './Onboarding.css';
 
@@ -8,7 +8,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [selectedTrack, setSelectedTrack] = useState('business');
   const [loadingStep, setLoadingStep] = useState(0);
-  const { setUserType, login } = useApp();
+  const { completeOnboarding } = useAuth();
   const navigate = useNavigate();
 
   const loadingMessages = [
@@ -24,8 +24,7 @@ export default function Onboarding() {
           if (prev >= 2) {
             clearInterval(interval);
             setTimeout(() => {
-              login();
-              navigate('/dashboard');
+              navigate('/plans');
             }, 600);
             return prev;
           }
@@ -35,12 +34,13 @@ export default function Onboarding() {
 
       return () => clearInterval(interval);
     }
-  }, [step, login, navigate]);
+  }, [step, navigate]);
 
-  const handleTrackSubmit = () => {
-    setUserType(selectedTrack);
+  const handleTrackSubmit = async () => {
+    await completeOnboarding(selectedTrack);
     setStep(2);
   };
+
 
   return (
     <div className="onboarding-page">

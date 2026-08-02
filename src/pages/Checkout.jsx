@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import StepIndicator from '../components/StepIndicator';
 import ProtectedRoute from '../components/ProtectedRoute';
 import './Checkout.css';
@@ -23,10 +24,14 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { setTier, addToast } = useApp();
+  const { activatePlan } = useAuth();
 
   const planParam = new URLSearchParams(location.search).get('plan');
   const pendingPlan = sessionStorage.getItem('trackin_id_pending_plan');
-  const plan = planParam || pendingPlan || 'pro';
+  const pendingPlanParsed = pendingPlan ? JSON.parse(pendingPlan) : null;
+  const plan = planParam || pendingPlanParsed?.plan || 'pro';
+  const billingCycle = pendingPlanParsed?.billingCycle || 'monthly';
+
 
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [processing, setProcessing] = useState(false);
@@ -81,8 +86,13 @@ export default function Checkout() {
       setProgressText('Activating your plan...');
     }, 1500);
 
-    setTimeout(() => {
-      setTier(plan);
+    setTimeout(async () => {
+      try {
+        await activatePlan(plan, billingCycle);
+        setTier(plan);
+      } catch (err) {
+        console.error('Error activating plan', err);
+      }
       sessionStorage.removeItem('trackin_id_pending_plan');
       setProcessing(false);
       addToast(`Plan ${tierNames[plan]} activated!`, 'success');

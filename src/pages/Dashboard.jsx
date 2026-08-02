@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { useTier } from '../hooks/useTier';
 import Gate from '../components/Gate';
 import Toast from '../components/Toast';
@@ -15,12 +16,14 @@ import './Dashboard.css';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const { user, logout, toggleDarkMode, darkMode } = useApp();
+  const { toggleDarkMode, darkMode, logout: appLogout } = useApp();
+  const { user, logout: authLogout } = useAuth();
   const { currentTier } = useTier();
   const navigate = useNavigate();
 
   const handleConfirmLogout = () => {
-    logout();
+    authLogout();
+    appLogout();
     setShowLogoutModal(false);
     // Redirect to Landing Page as requested
     navigate('/');
