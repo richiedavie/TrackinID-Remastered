@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -19,10 +20,11 @@ function App() {
   return (
     <AppProvider>
       <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
+        <ErrorBoundary>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             
             {/* Protected Routes */}
@@ -74,13 +76,13 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
-      </AuthProvider>
-    </AppProvider>
+      </ErrorBoundary>
+    </AuthProvider>
+  </AppProvider>
   );
 }
 
