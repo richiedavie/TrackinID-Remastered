@@ -4,6 +4,8 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import StepIndicator from '../components/StepIndicator';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import './Checkout.css';
 
 function formatCardNumber(value) {
@@ -106,8 +108,10 @@ export default function Checkout() {
   if (!plan) return null;
 
   return (
-    <div className="checkout-page">
-      <div className="container">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
+      <Navbar />
+      <div className="checkout-page" style={{ flex: 1 }}>
+        <div className="container">
         <StepIndicator currentStep={2} totalSteps={3} />
 
         <div className="checkout-layout">
@@ -311,5 +315,6 @@ export default function Checkout() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

@@ -65,8 +65,11 @@ export default function PricingCards({ onPlanSelect, userType, compact }) {
           const isRecommended = recommendedTiers.includes(tierKey);
           return (
             <div key={idx} className={`card pricing-card ${tier.popular ? 'popular' : ''} ${isRecommended ? 'recommended' : ''}`}>
-              {isRecommended && <div className="recommended-badge">Recommended for you</div>}
-              {tier.popular && <div className="popular-badge">Most Popular</div>}
+              {isRecommended ? (
+                <div className="recommended-badge">Recommended for you</div>
+              ) : tier.popular ? (
+                <div className="popular-badge">Most Popular</div>
+              ) : null}
               <div className="pricing-card-header">
                 <h3>{tier.name}</h3>
                 <div className="price">
