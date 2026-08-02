@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { tiers } from '../components/PricingCards';
 import StepIndicator from '../components/StepIndicator';
 import ProtectedRoute from '../components/ProtectedRoute';
 import './Checkout.css';
@@ -23,10 +22,11 @@ function formatExpiry(value) {
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { handleUpgradeTier, loading } = useApp();
+  const { setTier, addToast } = useApp();
 
   const planParam = new URLSearchParams(location.search).get('plan');
-  const plan = planParam || 'pro';
+  const pendingPlan = sessionStorage.getItem('trackin_id_pending_plan');
+  const plan = planParam || pendingPlan || 'pro';
 
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [processing, setProcessing] = useState(false);
@@ -68,15 +68,12 @@ export default function Checkout() {
     elite: { monthly: '1.2JT', yearly: '2.3JT' },
   };
 
-  const selectedTierData = tiers.find((t) => t.name === tierNames[plan]) || tiers[0];
-
   const selectedTier = {
     name: tierNames[plan] || plan,
     price: tierPrices[plan]?.monthly || '140K',
-    features: selectedTierData.features,
   };
 
-  const handlePay = async () => {
+  const handlePay = () => {
     setProcessing(true);
     setProgressText('Verifying payment...');
 
@@ -84,21 +81,15 @@ export default function Checkout() {
       setProgressText('Activating your plan...');
     }, 1500);
 
-    setTimeout(async () => {
-      const result = await handleUpgradeTier({
-        tier: plan,
-        planName: tierNames[plan] || plan,
-        price: selectedTier.price,
-      });
-
+    setTimeout(() => {
+      setTier(plan);
+      sessionStorage.removeItem('trackin_id_pending_plan');
       setProcessing(false);
-
-      if (result.success) {
-        navigate('/dashboard', {
-          replace: true,
-          state: { planName: tierNames[plan] || plan, paymentSuccess: true },
-        });
-      }
+      addToast(`Plan ${tierNames[plan]} activated!`, 'success');
+      navigate('/dashboard', {
+        replace: true,
+        state: { planName: tierNames[plan] || plan, paymentSuccess: true },
+      });
     }, 3000);
   };
 
@@ -120,16 +111,6 @@ export default function Checkout() {
               <span className="amount">{selectedTier.price}</span>
               <span className="period">/month</span>
             </div>
-            <ul className="summary-features">
-              {selectedTier.features.map((f, i) => (
-                <li key={i}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  {f}
-                </li>
-              ))}
-            </ul>
           </div>
 
           <div className="checkout-payment">

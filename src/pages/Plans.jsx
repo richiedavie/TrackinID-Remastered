@@ -1,36 +1,40 @@
-import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import { useApp } from '../context/AppContext';
+import { TIERS } from '../config/tiers';
 import PricingCards from '../components/PricingCards';
+import StepIndicator from '../components/StepIndicator';
+import ProtectedRoute from '../components/ProtectedRoute';
 import './Plans.css';
 
-export default function Plans() {
-  const [isYearly, setIsYearly] = useState(false);
+export default function PlansPage() {
+  const { subscriptionTier } = useApp();
 
   return (
-    <div className="plans-page">
-      <Navbar />
-      <div className="container section-padding">
-        <div className="text-center plans-header">
-          <h2>Select a Subscription Plan</h2>
-          <p>Choose the tier that matches your vehicle fleet size and capability requirements.</p>
+    <ProtectedRoute>
+      <div className="plans-page">
+        <div className="container">
+          <StepIndicator currentStep={1} totalSteps={3} />
 
-          <div className="pricing-toggle">
-            <span className={!isYearly ? 'active' : ''}>Monthly</span>
-            <button
-              className={`toggle-btn ${isYearly ? 'active' : ''}`}
-              onClick={() => setIsYearly(!isYearly)}
-              aria-label="Toggle billing frequency"
-            >
-              <div className="toggle-slider" />
-            </button>
-            <span className={isYearly ? 'active' : ''}>Yearly (Save 20%)</span>
+          <div className="plans-header">
+            <h1>Choose Your Plan</h1>
+            <p>
+              {subscriptionTier
+                ? `Current plan: ${TIERS[subscriptionTier]?.name || subscriptionTier}`
+                : 'Select the plan that fits your fleet\'s needs.'}
+            </p>
           </div>
-        </div>
 
-        <PricingCards isYearly={isYearly} />
+          <PricingCards
+            onPlanSelect={(tier, billingCycle) => {
+              sessionStorage.setItem(
+                'trackin_id_pending_plan',
+                JSON.stringify({ plan: tier, billingCycle })
+              );
+              window.location.href = `/checkout?plan=${tier}`;
+            }}
+            userType={null}
+          />
+        </div>
       </div>
-      <Footer />
-    </div>
+    </ProtectedRoute>
   );
 }
